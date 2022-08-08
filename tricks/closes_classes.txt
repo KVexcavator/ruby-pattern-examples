@@ -1,0 +1,49 @@
+# классы от которых нельза наследоваться (закрытые)
+сlass Class
+  def final(klass)
+    class << klass
+      def inherited(subclass)
+        error = "Illegal attempt to subclass #{self} with #{subclass}"
+        raise RuntimeError, error
+      end
+    end
+  end
+end
+
+class Foo
+  final(self) # No subclasses allowed
+end
+
+# Boom!
+class Bar < Foo
+end
+
+##############
+# закрытый класс, которому нельза определять переопределять метод
+
+class Module
+  def close(klass)
+    class << self
+      def method_added(method)
+        error = "cannot add or change method #{method} to closed"
+        error += " class #{self}"
+        raise RuntimeError, error
+      end
+    end
+  end
+end
+
+class Foo
+  def test
+    puts "hello"
+  end
+
+  close(self) # No method additions/redefinitions allowed
+end
+
+# Boom!
+class Foo
+  def test2
+    puts "eh?"
+  end
+end

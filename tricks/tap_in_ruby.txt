@@ -1,0 +1,18 @@
+позволяет вам делать что-то с объектом внутри блока, и этот блок всегда возвращает сам объект
+Метод определен в руби так:
+class Object
+  def tap
+    yield self
+    self
+  end
+end
+Пример применения длч конфигурирования:
+user = User.new.tap do |u|
+  u.username = "kartik"
+  u.save!
+end
+сделает тоже самое, что и:
+user = User.new
+user.username = "kartik"
+user.save!
+
