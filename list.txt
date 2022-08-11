@@ -1,0 +1,63 @@
+Creational patterns:
++ Abstract Factory
++ Factory method
++ Builder
++ Dependency Injection
+Lazy initialization
+Object pool
++ Prototype
++ Singleton
+
+Structural patterns:
++ Adapter
+Adapter pipeline
+Retrofit Interface
+Aggregate
++ Bridge
+Tombstone
++ Composite
++ Decorator
+Extensibility
+Facade
+Flyweight
+Marker
+Pipes and filters:
+Opaque pointer
++ Proxy
+
+Behavioral patterns:
+Blackboard design
++ Chain of responsibility pattern
++ Command pattern: Command objects encapsulate an action and its parameters
+"Externalize the stack"
+Interpreter
++ Iterator
++ Mediator
++ Memento
+Null object
+Observer
+Weak reference
+Protocol stack
+Scheduled-task
+Single-serving visitor
+Specification
+State
+Strategy
+Template method
+Visitor
+
+шаблоны параллелизма — это те типы шаблонов проектирования, которые имеют дело с парадигмой многопоточного программирования
+Concurrency patterns:
+Active Object
+Balking pattern
+Barrier
+Double-checked locking
+Guarded suspension
+Leaders/followers pattern
+Monitor Object
+Nuclear reaction
+Reactor pattern
+Read write lock pattern
+Scheduler pattern
+Thread pool pattern
+Thread-local storage
