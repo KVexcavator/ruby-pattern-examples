@@ -42,7 +42,7 @@ tax_man = TaxMan.new
 fred.add_observer(tax_man)
 fred.salary = 35000.0
 
-# в Ruby есть специальный модуль Observable https://ruby-doc.org/stdlib-2.5.3/libdoc/observer/rdoc/Observable.html
+# в Ruby есть специальный модуль Observable https://github.com/ruby/observer
 
 require 'observer'
 class Employee

@@ -19,7 +19,7 @@ Tombstone
 + Composite
 + Decorator
 Extensibility
-Facade
++ Facade
 Flyweight
 Marker
 Pipes and filters:
@@ -36,13 +36,13 @@ Interpreter
 + Mediator
 + Memento
 Null object
-Observer
++ Observer
 Weak reference
 Protocol stack
 Scheduled-task
 Single-serving visitor
 Specification
-State
++ State
 Strategy
 Template method
 Visitor
