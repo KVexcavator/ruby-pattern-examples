@@ -22,7 +22,7 @@ Extensibility
 + Facade
 Flyweight
 Marker
-Pipes and filters:
+Pipes and filters
 Opaque pointer
 + Proxy
 
