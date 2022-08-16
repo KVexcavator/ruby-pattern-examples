@@ -20,7 +20,7 @@ Tombstone
 + Decorator
 Extensibility
 + Facade
-Flyweight
++ Flyweight
 Marker
 Pipes and filters
 Opaque pointer
@@ -43,7 +43,7 @@ Scheduled-task
 Single-serving visitor
 Specification
 + State
-Strategy
++ Strategy
 Template method
 Visitor
 
