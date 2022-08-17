@@ -4,7 +4,7 @@ Creational patterns:
 + Builder
 + Dependency Injection
 Lazy initialization
-Object pool
++ Object pool
 + Prototype
 + Singleton
 + Configuration
@@ -44,7 +44,7 @@ Single-serving visitor
 Specification
 + State
 + Strategy
-Template method
++ Template method
 Visitor
 
 шаблоны параллелизма — это те типы шаблонов проектирования, которые имеют дело с парадигмой многопоточного программирования
