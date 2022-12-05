@@ -95,3 +95,5 @@ to = [1, 1, 1]
 excluded = [[0, 0, 1], [1, 0, 0]]
 
 path = SearchTree.plant(from, to, excluded)
+
+# https://github.com/KVexcavator/ruby-pattern-examples/blob/main/tricks/lock.rb
