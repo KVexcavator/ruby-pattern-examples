@@ -1,21 +1,19 @@
-def binary_search(list, item)
-  low = 0
-  high = list.length - 1
-  while low <= high
-    mid = (low + high)
-    guess = list[mid]
-    if guess == item
-      return puts mid
-    elsif guess > item
-      high = mid - 1
+def binary_search(list, n)
+  first = 0
+  last = list.length - 1
+  while last >= first
+    # целочисленное деление div(дробное fdiv)
+    mid = (first + last).div(2)
+    return true if list[mid] == n
+    if  n < list[mid]
+      last = mid - 1
     else
-      low = mid + 1
+      first = mid + 1
     end
   end
-  return puts "None"
+  return false
 end
 
-
-my_list = [1, 3, 5, 7, 9]
-binary_search(my_list, 3)
-binary_search(my_list, -1)
+p my_list = [1, 3, 5, 7, 9]
+p binary_search(my_list, 3)
+p binary_search(my_list, -1)
