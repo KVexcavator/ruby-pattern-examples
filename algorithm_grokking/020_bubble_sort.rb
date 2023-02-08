@@ -1,13 +1,15 @@
 def bubble_sort(list)
-  length = list.length - 1
-  (0...length).each do
-    (0...length).each do |i|
-      if list[i] > list[i + 1]
-        list[i], list[i + 1] = list[i + 1], list[i]
+  len = list.length - 1
+  len.times do |i|
+    no_swaps = true
+    (len - i).times do |j|
+      if list[j] > list[j + 1]
+        list[j], list[j + 1] = list[j + 1], list[j]
+        no_swaps = false
       end
     end
+    return list if no_swaps == true
   end
-  list
 end
 
 p arr = [1,9,6,32,74,2,1]
