@@ -14,21 +14,13 @@ def length_of_longest_substring(s)
   longests.max
 end
 
-p str = "abcabcbb"
-p length_of_longest_substring(str)
-p str = "bbbbb"
-p length_of_longest_substring(str)
-p str = "pwwkew"
-p length_of_longest_substring(str)
-p str = ""
-p length_of_longest_substring(str)
-p str = "cbb"
-p length_of_longest_substring(str)
-p str = "abcabcbb"
-p length_of_longest_substring(str)
-p str = "bcb"
-p length_of_longest_substring(str)
-p str = "bbc"
-p length_of_longest_substring(str)
-p str = "asjrgapa"
-p length_of_longest_substring(str)
+["abcabcbb", "bbbbb", "pwwkew", "", "cbb", "abcabcbb", "bcb", "bbc", "asjrgapa"].each do |str|
+  puts "Res: #{length_of_longest_substring(str)} in string-#{str}"
+end
+
+def generate_code(number)
+  charset = Array('A'..'Z') + Array('a'..'z')
+  Array.new(number) { charset.sample }.join
+end
+p string = generate_code(40)
+p length_of_longest_substring(string)
