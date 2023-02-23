@@ -1,0 +1,224 @@
+Вы можете определить блок только при вызове метода. Блок передается прямо в метод, и метод может выполнить обратный вызов блока с ключевым словом yield.
+
+def a_method(a, b)
+	a + yield(a, b)
+end
+a_method(1, 2){|x, y| (x + y) * 3 }  # => 10
+---------------------------------------
+Kernel#block_given?
+
+def a_method
+return yield if block_given?
+'no block'
+end
+a_method  # => "no block"
+a_method { "here's a block!" } # => "here's a block!"
+-------------------------------------
+Есть тонкая разница между классом и модулем с одной стороны и def с другой. Код в определении класса или модуля выполняется немедленно.И наоборот, код в определении метода выполняется позже, когда вы в конечном итоге вызываете метод.
+
+Как передать переменную в класс и метод класса:
+my_var = "Success"
+MyClass = Class.new do  - принимает блок
+	"#{my_var} in the class definition"
+
+	define_method :my_method do
+	"#{my_var} in the method"
+	end
+end
+MyClass.new.my_method
+--------------------------------------
+Как поделиться переменной среди нескольких методов так, чтобы кто-либо другой не видел эту переменную. Вы можете сделать это, определив все методы в той же Flat Scope, что и переменная:
+
+def define_methods
+	shared = 0
+	Kernel.send :define_method, :counter do
+		shared
+	end
+	Kernel.send :define_method, :inc do |x|
+		shared += x
+	end
+end
+
+define_methods
+
+counter # => 0
+inc(4)
+counter # => 4
+--------------------------------------------
+Блок - это замыкание: когда вы определяете блок, он захватывает привязки
+в текущей среде и носит их с собой. Таким образом, вы можете заменить Scope Gate вызовом метода, зафиксировать текущие привязки в замыкании и передать замыкание методу.
+Вы можете заменить class на Class.new, module на Module.new и def на Module #define_method. Это Flat Scope . (см выше)
+-------------------------------------------
+BasicObject#instance_eval, оценивает блок в контексте объекта:
+class MyClass
+	def initialize
+		@v = 1
+	end
+end
+obj = MyClass.new
+obj.instance_eval do
+	self # => #<MyClass:0x3340dc @v=1>
+	@v # => 1
+end
+Даже если instance_eval изменяет себя, блок, который вы передаете instance_eval, все равно может видеть привязки из того места, где он определен, как и любой другой блок:
+v = 2
+obj.instance_eval { @v = v }
+obj.instance_eval { @v } # => 2
+----------------------------
+instance_exec позволяет передавать аргументы блоку.
+
+class C
+	def initialize
+		@x = 1
+	end
+end
+class D
+	def twisted_method
+		@y = 2
+		C.new.instance_exec(@y) {|y| "@x: #{@x}, @y: #{y}" }
+	end
+end
+------------------------------
+Чистые комнаты
+Иногда вы создаете объект, просто чтобы оценить блоки внутри него. Такой объект можно назвать чистой комнатой:
+class CleanRoom
+	def current_temperature
+		# ...
+	end
+end
+clean_room = CleanRoom.new
+clean_room.instance_eval do
+	if current_temperature < 20
+		# TODO: wear jacket
+	end
+end
+===================================
+Callable Objects
+механизм «сначала код пакета, вызов позже» не является эксклюзивным для блоков. В Ruby есть как минимум три других места, где вы можете упаковать код:
+• В proc, который в основном представляет собой объект, превращенный в блок.
+• В lambda, которая представляет собой небольшую вариацию proc
+• В методе
+------------------------------------
+Proc Objects
+Ruby предоставляет стандартный библиотечный класс Proc. Proc - это блок, превращенный в объект. Вы можете создать Proc, передав блок Proc.new.
+
+Deferred Evaluation (Отложенная оценка):
+inc = Proc.new {|x| x + 1 }
+или
+my_proc = proc { "Bill" }
+# more code...
+inc.call(2) # => 3
+
+Сщздание лямбды:
+dec = lambda {|x| x - 1 }
+или
+dec = ->(x) { x - 1 }
+dec.class # => Proc
+dec.call(2) # => 1
+------------------------------------
+The & Operator
+Чтобы прикрепить привязку к блоку, вы можете добавить к методу один специальный аргумент. Этот аргумент должен быть последним в списке аргументов и иметь префикс &. Вот метод, который передает блок другому методу:
+
+def math(a, b)
+	yield(a, b)
+end
+def do_math(a, b, &operation)
+	math(a, b, &operation)
+end
+do_math(2, 3) {|x, y| x * y} # => 6
+Если вы вызываете do_math без блока, аргумент &operation привязан к nil, и операция yield в math завершается ошибкой.
+
+Что, если вы хотите преобразовать блок в Proc? Как оказалось, если вы ссылались на операцию в предыдущем коде, у вас уже есть объект Proc.
+
+def my_method(&the_proc)
+	the_proc
+end
+p = my_method {|name| "Hello, #{name}!" }
+p.class # => Proc
+p.call("Bill") # => "Hello, Bill!"
+
+Опять же, вы можете использовать оператор & для преобразования Proc в блок:
+def my_method(greeting)
+	"#{greeting}, #{yield}!"
+end
+my_proc = proc { "Bill" }
+my_method("Hello", &my_proc)
+
+----------------------------------
+Procs vs. Lambdas
+процессы, созданные с помощью лямбда, называются лямбда-выражениями, а другие просто называются процедурами. (Вы можете использовать метод Proc#lambda?, чтобы проверить, является ли Proc лямбда.)
+
+В лямбде return просто возвращается из лямбды:
+def double(callable_object)
+	callable_object.call * 2
+end
+l = lambda { return 10 }
+double(l) # => 20
+
+В процессе return ведет себя иначе. Вместо возврата из процедуры он возвращается из области, в которой была определена сама процедура:
+def another_double
+	p = Proc.new { return 10 }
+	result = p.call
+	return result * 2  # недостижимый код!
+end
+another_double # => 10
+
+Вы можете избежать такой ошибки, если не будете использовать явные возвраты:
+p = Proc.new {10}
+двойной (p) # => 20
+------------------------------------
+Procs, Lambdas, and Arity (арность)
+
+Вызов лямбды с неправильной арностью приводит к ошибке ArgumentError. 
+С другой стороны, proc подбирает список аргументов в соответствии со своими ожиданиями:
+
+p = Proc.new {|a, b| [a, b]}
+p.arity # => 2
+p.call(1, 2, 3) # => [1, 2]
+p.call(1) # => [1, nil]
+===================================
+Объекты метода
+
+Вызывая метод Kernel#method, вы получаете сам метод как объект Method, который позже можно выполнить с помощью вызова Method#call:
+
+class MyClass
+	def initialize(value)
+		@x = value
+	end
+	def my_method
+		@x
+	end
+end
+object = MyClass.new(1)
+m = object.method :my_method
+m.call # => 1
+--------------------------------------
+Unbound Methods  Несвязанные методы
+
+UnboundMethod похожи на Method, которые были отделены от своего исходного класса или модуля. Вы можете превратить метод в UnboundMethod, вызвав Method#unbind. Вы также можете получить UnboundMethod напрямую, вызвав Module#instance_method:
+
+module MyModule
+	def my_method
+		42
+	end
+end
+
+unbound = MyModule.instance_method(:my_method)
+unbound.class  # => UnboundMethod
+
+Вы также можете привязать UnboundMethod, передав его в Module#define_method:
+String.class_eval do
+	define_method :another_method, unbound
+end
+"abc".another_method # => 42
+
+
+
+
+
+
+
+
+
+
+

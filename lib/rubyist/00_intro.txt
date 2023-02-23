@@ -1,0 +1,458 @@
+irb
+require "bundler"
+puts $:.grep(/bundler/) даст путь от home
+------------------------------------------
+методы объектов
+object_id - вывод id
+respond_to? - есть ли метод?
+send (synonym: __send__ ) - вызвать метод
+
+if ticket.respond_to?(request)
+	puts ticket.send(request)
+else
+	puts "No such information available"
+end
+-----------------------------------------
+Required and optional arguments
+obj.one_arg(x)  obj.multi_args(*x) two_or_more(a,b,*c)
+--------------------------------------------
+Default values for arguments
+default_args(a,b,c=1)
+-------------------------------------------
+Order of parameters and arguments
+mixed_args(a,b,*c,d)  args_unleashed(a,b=1,*c,d,e)
+------------------------------------------
+метод dup, который дублирует объект
+change_string(s.dup)
+заморозить объект, что предотвращает его дальнейшее изменение
+s.freeze
+метод clone. Это очень похоже на dup.
+Разница в том, что если клонируете замороженный объект, клон также будет заморожен, тогда как если дублировать замороженный объект, дубликат не заморожен
+------------------------------------------
+Time.new.strftime("%m-%d-%y") - текущая дата
+------------------------------------------
+Синтаксис &: является сокращенным способом итерации по каждому из элементов в Массив
+>> ["havoc", "prodigy"].map(&:capitalize)
+=> ["Havoc", "Prodigy"]
+---------------------------------------------------
+Person.ancestors  - список предков класса
+----------------------------------------------------
+предустановленные глобальные переменный
+$. - исполняемая строка
+$0 - имя исполняемого файла
+$: - исполняемая директории
+$$ - id процесса
+require "English" - для использования полных(понятных $LOAD_PATH instead of $:) имён
+--------------------------------------------------
+ruby -e 'p Kernel.private_instance_methods.sort'
+--------------------------------------------------
+ruby -cw filename.rb
+-------------------------------------------------
+Exception name: 190
+RuntimeError      raise
+NoMethodError     a.some_unknown_method_name
+NameError         a = some_random_identifier
+IOError           STDIN.puts("Don't write to STDIN!")
+Errno::error      File.open(-12)
+TypeError         a = 3 + "can't add a string to a number!"
+ArgumentError     def m(x); end; m(1,2,3,4,5)
+ZeroDivisionError   100/0
+--------------------------------------------------
+binding.irb   вставитьв код для отладки
+--------------------------------------------------
+irb
+>> fh = File.open("/tmp/display.out", "w")
+=> #<File:/tmp/display.out>
+>> "Hello".display(fh)
+=> nil
+>> fh.close
+=> nil
+>> puts(File.read("/tmp/display.out"))
+Hello
+--------------------------------------------------
+def combine_names(first_name, last_name)
+first_name + " " + last_name
+end
+names = ["David", "Black"]
+puts combine_names(*names)
+--------------------------------------------------
+inspect:
+"I am a String object".methods
+String.methods.sort
+str.methods.include?(:shout)
+str.singleton_methods
+Enumerable.instance_methods.sort
+MyClass.private_instance_methods
+-------------------------------------------------
+Строки:
+негативный поиск знаков с строке:
+string.count("^aey. ")
+string.count("ag-m", "^l") считает "а" и "g-m", кроме "l"
+Трансформация:
+string.rjust(25,'.')
+"...........David A. Black"
+string.ljust(25,'><')
+"David A. Black><><><><><>"
+"The middle".center(20, "*")
+"*****The middle*****"
+strip, rstrip, lstrip
+chop, chomp
+clear,replace, delete
+"David A. Black".crypt("34")
+=> "347OEY.7YRmio"
+"abc".succ
+"abd"
+Конверсия и кодировка:
+>> "100".to_i(17)
+=> 289
+oct, hex, to_s, to_str, to_f,to_r, to_c, to_sym
+str.encode!("US-ASCII")
+str.encoding
+-----------------------------------------------------
+СИМВОЛЫ:
+"a".to_sym
+:a
+"Converting string to symbol with intern....".intern
+Symbol.all_symbols.grep(/abc/)
+=> [:abc]
+"abc".send(:upcase) - some_object.send(method_name.to_sym)
+----------------------------------------------------
+ЧИСЛОВЫЕ ОБЪЕКТЫ:
+0x12
+=> 18  -16 ричное число
+012
+=> 10  -8 рсное число
+---------------------------------------------------
+ВРЕМЯ И ДАТА:
+require 'date'
+Date.parse("April 24 1705").england.strftime("%B %d %Y")
+Date.today
+Date.new(1959,2,1)
+Date.parse("2003/6/9")
+Date.parse("03/6/9")
+Date.parse("November 2 2013")
+Date.parse("Nov 2 2013")
+Date.parse("2 Nov 2013")
+
+Time.new
+Time.at(100000000) в сек с 1 января 1970
+Time.mktime(2007,10,3,14,3,6)
+=> 2007-10-03 14:03:06 -0400
+
+require 'time'
+Time.parse("March 22, 1985, 10:35 PM")
+=> 1985-03-22 22:35:00 -0500
+
+DateTime.new(2009, 1, 2, 3, 4, 5)
+=> 2009-01-02T03:04:05+00:00
+DateTime.now
+=> 2018-12-15T19:02:29-05:00
+
+year, month, day, hour, minute, second  - time or date/time obj.method
+sunday?, saturday?, friday?
+
+Specifier   Description
+%Y          Year (four digits)
+%y          Year (last two digits)
+%b, %B      Short month, full month
+%m          Month (number)
+%d          Day of month (left-padded with zeros)
+%e          Day of month (left-padded with blanks)
+%a, %A      Short day name, full day name
+%H, %I      Hour (24-hour clock), hour (12-hour clock)
+%M          Minute
+%S          Second
+%c          Equivalent to "%a %b %d %H:%M:%S %Y"
+%x          Equivalent to "%m/%d/%y"
+
+Date.today.rfc2822
+DateTime.now.httpdate
+
+Time has to_date and to_datetime methods, 
+Date has to_time and to_datetime, 
+DateTime has to_time and to_date .
+
+Time object  +,- в секундах
+date/time objects +,-  d дни, >> <<  месяцы
+
+>> d = Date.today
+>> puts d.next
+>> puts d.next_year
+>> puts d.next_month(3)
+>> puts d.prev_day(10)
+upto and downto
+>> next_week = d + 7
+>> d.upto(next_week) {|date| puts "#{date} is a #{date.strftime("%A")}" }
+---------------------------------------------------------
+hash = { red: "ruby", white: "diamond", green: "emerald" }
+hash.each_with_index {|(key,value),i| puts "Pair #{i} is: #{key}/#{value}"}
+
+try_convent:
+Array (to_ary), Hash (to_hash), IO (to_io), Regexp (to_regexp),String (to_str)
+obj = Object.new
+Array.try_convert(obj) => nill
+def obj.to_ary; [1,2,3]; end 
+Array.try_convert(obj) => [1, 2, 3]
+def obj.to_ary; "Not an array!"; end 
+Array.try_convert(obj) => TypeError
+---------------------------------------------------------
+ARRAY:
+Array.new
+Array.new(3, "adc") - "abc" один и тот же объект
+Array.new(3) {"abc"} - "abc" разные объекты
+a = []
+Array(string) -> ["A string"] , если string = "A string"
+у строк нет to_a, его надо определять явно
+def string.to_a; split(/ /); end тогда разобьёт по пробелу ["A", "string"]
+>> %w(David\ A.\ Black is a Rubyist.)
+=> ["David A. Black", "is", "a", "Rubyist."]
+>> %W(Joe is #{2018 - 1981} years old.)
+=> ["David", "is", "37", "years", "old."]
+%i(a b c) - [:a, :b, :c]
+d = "David" 
+%I("#{d}") - [:"\"David\""]
+
+articles = array.values_at(0,3) создаст массив из элементов другого массива
+articles = array..dig(0,1,1) создаст массив из элементов вложенного массива
+
+unshift, push | <<  добавить элементы в массив
+shift, pop удалить из массива
+
+concat,+, replace, flatten, reverse, join, uniq, compact
+
+a = %w(one two three)
+a * "-"
+"one-two-three"
+
+Method name/sample call                 Meaning
+a.size (synonyms: length, count)   Number of elements in the array
+a.empty?                           True if a is an empty array; false if it has any elements
+a.include?(item)                   True if the array includes item; false, otherwise
+a.count(item)                      Number of occurrences of item in array
+a.first(n=1)                       First n elements of array
+a.last(n=1)                        Last n elements of array
+a.sample(n=1)                      n random elements from array
+-------------------------------------------------------------------------------
+HASHES
+h={}
+h=Hash.new
+Hash["Connecticut", "CT", "Delaware", "DE" ]
+=> {"Connecticut"=>"CT", "Delaware"=>"DE"}
+Hash[ [[1,2], [3,4], [5,6]] ]
+=> {1=>2, 3=>4, 5=>6}
+[[1,2],[3,4]].to_h
+=> {1=>2, 3=>4}
+
+state_hash["New York"] = "NY"
+state_hash.[]=("New York", "NY")
+state_hash.store("New York", "NY")
+
+state_hash.fetch("Nebraska", "Unknown state")
+state_hash.values_at("New Jersey","Delaware")
+state_hash.fetch_values("New Jersey", "Wyoming")
+
+h={ foo: { bar: "baz" } }
+h.dig(:foo, :bar)
+=> "baz"
+
+h = Hash.new(0)   0 значение по умолчанию
+h = Hash.new {|hash,key| hash[key] = 0 } не сущ.ключ тогда равен 0
+
+h1.update(h2), h3 = h1.merge(h2)
+
+h.select {|k,v| k > 1 }, h.reject {|k,v| k > 1 }
+
+compact, invert, clear, replace
+
+Method name/Sample call  Meaning
+h.has_key?(1)            True if h has the key 1
+h.include?(1)            Synonym for has_key?
+h.key?(1)                Synonym for has_key?
+h.member?(1)             Synonym for has_key?
+h.has_value?("three")    True if any value in h is "three"
+h.value?("three")        Synonym for has_value?
+h.empty?                 True if h has no key/value pairs
+h.size                   Number of key/value pairs in h
+
+add_to_city_database("New York City",
+state: "New York",
+population: 7000000,
+nickname: "Big Apple")  метод создания хеша
+
+def m(a: 1, b: 2, **c) в с попавдёт хаш преданых аргументов
+-----------------------------------------------------------------------
+RANGES
+r = Range.new(1,100), Range.new(1,100,true)
+r = 1..100, r = 1...100
+r.begin, r.end, r.exclude_end?
+r.cover?("a")
+r.include?("a")
+-----------------------------------------------------------------------
+SETS
+require "set"
+names = ["David", "Yukihiro", "Chad", "Amy"]
+name_set = Set.new(names) {|name| name.upcase }
+
+tri_state = Set.new(["New Jersey", "New York"])
+tri_state << "Connecticut"
+tri_state.delete("Connecticut")
+tri_state.add?("Pennsylvania") если нет добавить
+
+ intersection , aliased as &
+ union , aliased as + and |
+ difference , aliased as -
+
+tri_state.merge(["New York"])
+state_set.merge(state_hash.keys)
+
+tiny_states.subset?(small_states)
+small_states.superset?(tiny_states)
+======================================================
+Collections central: Enumerable and Enumerator
+------------------------------------------------------
+Enumerable.instance_methods(false).sort -список методов перечисления
+find - вернёт первое совпадение из блока
+find_all(select/reject) - вернёт все совпадения из блока
+
+colors = %w(red orange yellow green blue indigo violet)
+colors.grep(/o/)
+=> ["orange", "yellow", "indigo", "violet"]
+colors.grep(/o/) {|color| color.capitalize }
+=> ["Orange", "Yellow", "Indigo", "Violet"]
+colors.group_by {|color| color.size }
+=> {3=>["red"], 6=>["orange", "yellow", "indigo", "violet"], 5=>["green"], 4=>["blue"]}
+
+miscellany = [75, "hello", 10...20, "goodbye"]
+miscellany.grep(String) -> ["hello", "goodbye"] 
+miscellany.grep(50..100) -> [75]
+
+teens = people.partition {|person| person.teenager? }
+
+states = %w(NJ NY CT MA VT FL)
+states.first  - захватит элемент
+states.take(2) - захватит первые два
+states.drop(2) - захватит кроме первых двух
+states.take_while {|s| /N/.match(s) } => ["NJ", "NY"]
+states.drop_while {|s| /N/.match(s) }
+
+%w(Ruby C APL Perl Smalltalk).min -> "APL"
+%w(Ruby C APL Perl Smalltalk).min {|a,b| a.size <=> b.size } -> "C"
+%w{ Ruby C APL Perl Smalltalk }.min_by {|lang| lang.size } -> "C"
+%w{ Ruby C APL Perl Smalltalk }.minmax -> "APL", "Smalltalk"]
+%w{ Ruby C APL Perl Smalltalk }.minmax_by {|lang| lang.size } -> ["C", "Smalltalk"]
+
+state_hash.min - по ключу по умолчанию
+state_hash.min_by {|name, abbr| abbr } - по ключу или имени в блоке
+----------------------------------------------------------------
+Relatives of each
+
+[1,2,3].reverse_each {|e| puts e * 10 }
+array.each_with_index do |pres, i|; ... ; end ( с массивом можно each_index)
+hash.each_with_index {|(key,value),i| puts i };...;end
+
+array.each_slice(3) {|slice| p slice } создаст массивы по 3 через 3
+array.each_cons(3) {|cons| p cons } создаст массивы по 3 через 1
+---------------------------------------------------------------
+array.slice_before("=").to_a  or array.slice_after("=").to_a
+[1,2,3,3,4,5,6,6,7,8,8,8,9,10].slice_when { |i,j| i == j }.to_a
+
+collection.cycle(n) где n колич итерайций
+
+[1,2,3,4].inject(0) {|acc,n| acc + n } аккомулирует, нfчиная с 0  
+[1,2,3,4].inject(:+) тж короткая запись
+-----------------------------------------------------------------
+The map method:
+map always returns an array, is always the same size as the original enumerable.
+
+names.map {|name| name.upcase }
+names.map(&:upcase)
+----------------------------------------------------------------
+Strings as quasi-enumerables:
+
+str = "abcde"
+str.each_byte {|b| p b }
+str.each_char {|c| p c }
+
+str = "100\u20ac"
+str.each_codepoint {|cp| p cp }
+
+str = "This string\nhas three\nlines"
+str.each_line {|l| puts "Next line: #{l}" }
+
+str = "David!Alan!Black"
+$/ = "!"
+str.each_line {|l| puts "Next line: #{l}" }
+------------------------------------------------------
+Sorting enumerables:
+
+[3,2,5,4,1].sort
+["2",1,5,"3",4,"6"].sort {|a,b| a.to_i <=> b.to_i }
+
+year_sort = paintings.sort do |a,b|
+a.year <=> b.year
+end
+
+["2",1,5,"3",4,"6"].sort_by {|a| a.to_i }   or sort_by(&:to_i)
+-------------------------------------------------------
+obj.clamp(100, 200) если obj<100 вернёт 100, если obj>200 вернёт 200
+-------------------------------------------------------
+Создание счётчиков блоками
+e = Enumerator.new do |y|
+ (1..3). each {|i| y << i}
+end
+------------------------------------------------------
+Присоединение счетчиков к другим объектам
+obj.enum_for(method_name, arg1, arg2...)
+Enumerator.new(obj, method_name, arg1, arg2...)
+
+names = %w(David Black Yukihiro Matsumoto)
+e = names.enum_for(:select)
+e.each {|n| n.include?('a') }  each работает как select
+e = names.enum_for(:inject, "Names...")
+e.each {|string, name| string << "#{name}..."}
+-------------------------------------------------------
+Не явное создание счётчиков
+str.each_byte тоже str.enum_for(:each_byte)
+each , map , select , inject , тоже  вернут счётчики
+------------------------------------------------------
+Использование счётчиков
+------------------------------------------------------
+Счётчик всегда возвращает массив
+e = hash.to_enum
+e.select {|key, value| key=~ /c/}
+=> [[:cat, "feline"], [:cow, "bovine"]]  хеш вернёт хеш
+------------------------------------------------------
+give_me_an_array(array.to_enum) защитит массив от изменений (<< нельзя, select можно)
+-------------------------------------------------------
+пошаговая итерация с счётчиком
+names = %w(David Yukihiro)
+e = names.to_enum
+puts e.next
+puts e.next
+e.rewind
+puts e.next
+---------------------------------------------------------
+Счётчик цепочки методов
+---------------------------------------------------------
+animals.select {|n| n[0] < 'M' }.map(&:upcase).join(", ")
+каждый раз создаётся новый объект, это дорого, 
+each_slice, each_byte возвращает перечисляемые объект
+пример ленивой загрузки
+animals.each_slice(2).map do |predator, prey|
+"Predator: #{predator}, Prey: #{prey}\n"
+end
+-------------------------------------------------------
+Индексация счётчиков с with_index
+('a'..'z').map.with_index {|letter,i| [letter, i] }
+
+def play
+NOTES.to_enum
+end
+scale.play.with_index(1) {|note,i| puts "Note #{i}: #{note}" }
+--------------------------------------------------------
+Ленивые счётчики
+--------------------------------------------------------
+применяются для юесконечно больших kоллекций Float::INFINITY
+(1..Float::INFINITY).lazy.select {|n| n % 3 == 0 }.first(10)
+
+
