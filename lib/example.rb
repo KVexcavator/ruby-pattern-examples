@@ -3,3 +3,5 @@ class Example
     'Hello! Welcome to Example!'
   end
 end
+
+puts "HEllo examle"

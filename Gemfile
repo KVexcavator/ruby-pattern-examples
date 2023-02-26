@@ -6,4 +6,8 @@ gem 'rspec-core'
 gem 'rspec-expectations'
 gem 'rspec-mocks'
 gem 'rspec-support'
+
+# https://github.com/faker-ruby/faker
+gem 'faker'
 # gem "rails"
+# gem 'trtl'
