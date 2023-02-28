@@ -4,16 +4,16 @@
 
 class NameGetter
  	attr_accessor :first, :middle, :last
- 	
+
  	def initialize(first, middle, last)
  		@first, @middle, @last = first, middle, last
  	end
- 	
- 	def.NameGetter.ivanovich(first, last)
+
+ 	def NameGetter.ivanovich(first, last)
  		new(first, "Ivanovich", last)
  	end
  end
- 		
+
 ng1 = NameGetter.new("Vasiliy", "Petrovich", "Gromov")
 => #<NameGetter:0x00007f4f40810858 @first="Vasiliy", @last="Gromov", @middle="Petrovich">
 ng2 = NameGetter.ivanovich("Gleb","Sidorov")

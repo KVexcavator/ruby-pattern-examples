@@ -91,6 +91,17 @@ class LinkedList
     end
   end
 
+  def to_array
+    current = @head
+    arr = []
+    while current
+      pos = current.next
+      arr << current.data
+      current = pos
+    end
+    arr
+  end
+
   def print
     node = @head
     puts node
