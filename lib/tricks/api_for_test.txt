@@ -1,0 +1,7 @@
+https://docs.mapbox.com/api/overview/
+https://api.nasa.gov/
+https://favqs.com/api
+https://www.edamam.com/
+https://fakestoreapi.com/
+https://pokeapi.co/
+https://m.igdb.com/api
