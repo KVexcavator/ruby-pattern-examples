@@ -1,3 +1,4 @@
+# сдвинуть нули в конец
 def move_zeros(list)
   counter = 0
   list.each_with_index do |element, index|

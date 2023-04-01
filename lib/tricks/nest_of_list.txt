@@ -1,0 +1,30 @@
+часто поишут что то вроде в рельсах
+if @document.save
+   if current_user.role == "admin"
+     redirect_to admin_path
+   elsif current_user.role == "reviewer"
+     redirect_to reviewer_path
+   elsif current_user.role == "collaborator"
+     redirect_to collaborator
+   else
+     redirect_to user_path
+   end
+  else
+   render :new
+end
+
+но можно порефакторить
+redirection_path = Hash.new{|hash,key| hash[key] = user_path}
+redirection_path[:admin] =  admin_path
+redirection_path[:reviewer] =  reviewer_path
+redirection_path[:collaborator] =  collaborator_path
+
+@document.save ? redirect_to redirection_path[current_user.role.to_sym]
+    :  (render :new)
+
+или так
+redirection_path = Hash.new{|hash,key| hash[key] = ( %w(reviewer admin collaborator).include?(key.to_s) ?
+                                instance_eval("#{key}_path") : instance_eval('user_path') )}
+
+@document.save ? redirect_to redirection_path[current_user.role.to_sym]
+    :  (render :new)

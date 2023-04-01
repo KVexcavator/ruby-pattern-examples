@@ -1,7 +1,7 @@
 # удалить повторяющееся слова
 
 def delete_repeated_words(str)
-  arr = str.split(".")[0].split(" ")
+  arr = str.split(/\s+|,|\./).reject(&:empty?)
   dict = {}
   arr.each do |word|
     if dict.has_key? word
@@ -10,7 +10,7 @@ def delete_repeated_words(str)
       dict[word] = 1
     end
   end
-  arr.join(" ") + "."
+  arr.join(" ")
 end
 
-p delete_repeated_words("I am a self-taught programmer looking for a job as a programmer.")
+p delete_repeated_words("I am a self-taught programmer, looking for a job as a programmer.")

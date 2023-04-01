@@ -1,0 +1,34 @@
+https://www.sitepoint.com/how-to-solve-coding-anti-patterns-for-ruby-rookies/
+
+Используя блоки, мы эффективно передаем функции функциям. Многие методы Ruby используют это преимущество, чтобы обеспечить краткий, мощный, но очень читаемый код. Ruby Rookie может написать некоторый код, который условно загружает ряд задач Rake, например:
+
+load "project/tasks/annotations.rake"
+load "project/tasks/dev.rake"
+load "project/tasks/framework.rake"
+load "project/tasks/initializers.rake"
+load "project/tasks/log.rake"
+load "project/tasks/middleware.rake"
+load "project/tasks/misc.rake"
+load "project/tasks/restart.rake"
+load "project/tasks/routes.rake"
+load "project/tasks/tmp.rake"
+load "project/tasks/statistics.rake" if Rake.application.current_scope.empty?
+
+можжно обернуть элегантно
+
+%w(
+  annotations
+  dev
+  framework
+  initializers
+  log
+  middleware
+  misc
+  restart
+  routes
+  tmp
+).tap { |arr|
+  arr << 'statistics' if Rake.application.current_scope.empty?
+}.each do |task|
+  load "rails/tasks/#{task}.rake"
+end
