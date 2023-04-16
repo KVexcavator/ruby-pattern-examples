@@ -3,36 +3,36 @@
 
 class MinStack
   def initialize()
-    $main = []
-    $min = []
+    @main = []
+    @min = []
   end
 
   def main
-    $main
+    @main
   end
 
   def min
-    $min
+    @min
   end
 
   def push(num)
-    if $main.size == 0
-      $min.push(num)
-    elsif num <= $min[-1]
-      $min.push(num)
+    if @main.size == 0
+      @min.push(num)
+    elsif num <= @min[-1]
+      @min.push(num)
     else
-      $min.push($min[-1])
+      @min.push(@min[-1])
     end
-    $main.push(num)
+    @main.push(num)
   end
 
   def pop
-    $min.pop
-    $main.pop
+    @min.pop
+    @main.pop
   end
 
   def get_min
-    $min[-1]
+    @min[-1]
   end
 end
 

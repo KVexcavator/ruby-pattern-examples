@@ -1,0 +1,60 @@
+# https://medium.com/@umeriqbal256/turbo-streaming-1f0c9833227e
+# https://turbo.hotwired.dev/handbook/streams
+# Турбопотоки доставляют изменения страницы в виде фрагментов HTML, заключенных в самоисполняющиеся элементы <turbo-stream>. Каждый элемент потока указывает действие вместе с целевым идентификатором, чтобы объявить, что должно произойти с HTML внутри него.
+
+index.html.erb
+<div id='all_posts'>
+  <%= render partial: "posts/post", collection: @posts, as: :post %>
+</div>
+
+def create
+  @post = current_user.posts.build(post_params)
+  if @post.save
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.prepend('all_posts', partial: 'posts/post', locals: { post: @post })
+      end
+    end
+  else
+    render :new, flash.now[:notice] = "Message n sent"
+  end
+end
+
+# Обновите несколько целей одним потоком:
+
+index.html.erb
+<div id='posts_count'>
+  <%= @posts.count %>
+</div>
+<div id='all_posts'>
+  <%= render @posts %>
+</div>
+
+def create
+  @post = current_user.posts.build(post_params)
+  if @post.save
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.update(:posts_count, html: Post.count),
+          turbo_stream.prepend('all_posts', partial: 'posts/post', locals: { post: @post })
+        ]
+      end
+    end
+  else
+    render :new, flash.now[:notice] = "Message n sent"
+  end
+end
+
+# Как использовать поток в случае файла turbo_stream
+# если пользователь не перенаправляет на другую страницу при создании/обновлении поста, вот как он может добиться этого с помощью турбопотока
+
+application.html.erb
+<div id='post_form_wrapper'></div>
+
+new/edit.turbo_stream.erb
+<%= turbo_stream.update("post_form_wrapper") do %>
+  <%= render "shares/post_form", post: @post %>
+<% end %>
+
+# здесь вы можете видеть, что мы создаем div в application.html.erb с id  post_form_wrapper, когда запрос потока поступает в action контроллера, он будет отображать post_form, который находится в каталоге общих ресурсов в div, который мы уже определили в application.html.erb, сопоставив идентификатор id= «post_form_wrapper» в потоке (<%= turbo_stream.update («post_form_wrapper») do %>).

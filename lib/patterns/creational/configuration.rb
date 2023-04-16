@@ -1,13 +1,16 @@
 require 'ostruct'
 
 module Cat
-  def self.configuration
+  def configuration
     @configuration ||= OpenStruct.new # или {}
   end
 
-  def self.configure
+  def configure
     yield configuration if block_given?
   end
+
+  # this methods are self
+  module_function :configuration, :configure
 end
 
 Cat.configure do |config|

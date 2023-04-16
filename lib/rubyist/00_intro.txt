@@ -168,8 +168,8 @@ Specifier   Description
 Date.today.rfc2822
 DateTime.now.httpdate
 
-Time has to_date and to_datetime methods, 
-Date has to_time and to_datetime, 
+Time has to_date and to_datetime methods,
+Date has to_time and to_datetime,
 DateTime has to_time and to_date .
 
 Time object  +,- в секундах
@@ -191,9 +191,9 @@ try_convent:
 Array (to_ary), Hash (to_hash), IO (to_io), Regexp (to_regexp),String (to_str)
 obj = Object.new
 Array.try_convert(obj) => nill
-def obj.to_ary; [1,2,3]; end 
+def obj.to_ary; [1,2,3]; end
 Array.try_convert(obj) => [1, 2, 3]
-def obj.to_ary; "Not an array!"; end 
+def obj.to_ary; "Not an array!"; end
 Array.try_convert(obj) => TypeError
 ---------------------------------------------------------
 ARRAY:
@@ -209,7 +209,7 @@ def string.to_a; split(/ /); end тогда разобьёт по пробелу
 >> %W(Joe is #{2018 - 1981} years old.)
 => ["David", "is", "37", "years", "old."]
 %i(a b c) - [:a, :b, :c]
-d = "David" 
+d = "David"
 %I("#{d}") - [:"\"David\""]
 
 articles = array.values_at(0,3) создаст массив из элементов другого массива
@@ -323,7 +323,7 @@ colors.group_by {|color| color.size }
 => {3=>["red"], 6=>["orange", "yellow", "indigo", "violet"], 5=>["green"], 4=>["blue"]}
 
 miscellany = [75, "hello", 10...20, "goodbye"]
-miscellany.grep(String) -> ["hello", "goodbye"] 
+miscellany.grep(String) -> ["hello", "goodbye"]
 miscellany.grep(50..100) -> [75]
 
 teens = people.partition {|person| person.teenager? }
@@ -358,7 +358,7 @@ array.slice_before("=").to_a  or array.slice_after("=").to_a
 
 collection.cycle(n) где n колич итерайций
 
-[1,2,3,4].inject(0) {|acc,n| acc + n } аккомулирует, нfчиная с 0  
+[1,2,3,4].inject(0) {|acc,n| acc + n } аккомулирует, нfчиная с 0
 [1,2,3,4].inject(:+) тж короткая запись
 -----------------------------------------------------------------
 The map method:
@@ -398,7 +398,7 @@ obj.clamp(100, 200) если obj<100 вернёт 100, если obj>200 верн
 -------------------------------------------------------
 Создание счётчиков блоками
 e = Enumerator.new do |y|
- (1..3). each {|i| y << i}
+ (1..3).each {|i| y << i}
 end
 ------------------------------------------------------
 Присоединение счетчиков к другим объектам
@@ -435,7 +435,7 @@ puts e.next
 Счётчик цепочки методов
 ---------------------------------------------------------
 animals.select {|n| n[0] < 'M' }.map(&:upcase).join(", ")
-каждый раз создаётся новый объект, это дорого, 
+каждый раз создаётся новый объект, это дорого,
 each_slice, each_byte возвращает перечисляемые объект
 пример ленивой загрузки
 animals.each_slice(2).map do |predator, prey|
@@ -454,5 +454,3 @@ scale.play.with_index(1) {|note,i| puts "Note #{i}: #{note}" }
 --------------------------------------------------------
 применяются для юесконечно больших kоллекций Float::INFINITY
 (1..Float::INFINITY).lazy.select {|n| n % 3 == 0 }.first(10)
-
-

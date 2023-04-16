@@ -6,19 +6,19 @@ end
 
 class Texty::Searcher
   def self.search(query)
-    "searched #{query}"
+    puts "searched #{query}"
   end
 end
 
 class Texty::Finder
   def self.find(phrase)
-    "found #{phrase}"
+    puts "found #{phrase}"
   end
 end
 
 class Texty::Serializer
   def self.serialize(string)
-    "serialized #{string}"
+    puts "serialized #{string}"
   end
 end
 

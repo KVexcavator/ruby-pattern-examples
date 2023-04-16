@@ -1,0 +1,17 @@
+# https://www.akshaykhot.com/accessing-hash-values-like-methods/
+# в рельсе есть опция для вызова ключей хеша, как метода
+
+require "active_support/ordered_options"
+
+config = ActiveSupport::OrderedOptions.new
+
+# set the values
+config.api_key = "my-api-key"
+config.api_secret = "my-api-secret"
+
+# access the values
+config.api_key  # => 'my-api-key'
+config.api_secret # => 'my-api-secret'
+
+# Use the bang-version to raise an error when the value is blank
+config.password! # => raises KeyError: :password is blank

@@ -33,7 +33,9 @@ class TextParser
 end
 
 parser_xml = TextParser.new('My Text', XMLParser.new)
-parser_xml.parse => "<text>My Text</text>"
+parser_xml.parse
+# => "<text>My Text</text>"
 
 parser_json = TextParser.new('My Text', JSONParser.new)
-parser_json.parse => "{ text: My Text }"
+parser_json.parse
+# => "{ text: My Text }"
