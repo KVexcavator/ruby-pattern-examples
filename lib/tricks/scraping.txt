@@ -1,0 +1,50 @@
+# извлечение данных с веб-сайта
+
+Gems:
+Watir: Watir нужен для автоматического тестирования. Это гем, работающий на Selenium, который может имитировать поведение пользователя.
+
+Webdriver: используется с Watir. Это поможет загрузить последнюю версию драйвера браузера.
+
+Nokogiri: помогает упростить процесс анализа веб-страниц. Он может быстро анализировать XML и HTML, обеспечивает доступ к селекторам CSS3 и XPath и обнаруживает поврежденные документы HTML.
+
+# Проверка веб-страницы
+
+require 'watir'
+require 'webdrivers'
+require 'nokogiri
+
+browser = Watir::Browser.new
+browser.goto 'https://blog.eatthismuch.com/latest-articles/'
+parsed_page = Nokogiri::HTML(browser.html)
+File.open("parsed.txt", "w") { |f| f.write "#{parsed_page}" }
+browser.close
+
+# Извлечение определенных разделов
+
+puts parsed_page.title
+
+links = parsed_page.css('a')
+links.map {|element| element["href"]}
+puts links
+
+property_cards = parsed_page.xpath("//div[contains(@class, 'td_module_10')]")
+property_cards.each do |card|
+  title = card.xpath("div[@class='td-module-thumb']/a/@title")
+  description = card.xpath("div[@class='item-details']/p[@class='td-description']")
+  price= card.xpath("div[@class='item-details']/span[@class='td-price']")
+end
+
+# Экспорт данных в CSV
+
+require 'csv'
+
+CSV.open("properties.csv", "a+") do |csv|
+  csv << ["title", "description", "price"]
+  property_cards = parsed_page.xpath("//div[contains(@class, 'td_module_10')]")
+  property_cards.each do |card|
+    title = card.xpath("div[@class='td-module-thumb']/a/@title")
+    description = card.xpath("div[@class='item-details']/p[@class='td-description']")
+    price= card.xpath("div[@class='item-details']/span[@class='td-price']")
+    csv << [title.first.value, description.first.value, price.first.text.strip]
+  end
+end

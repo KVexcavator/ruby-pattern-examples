@@ -1,0 +1,172 @@
+su======================================================================
+# Disable RVM from trying to install necessary software via apt-get
+rvm autolibs disable  (enable) rvm autolibs rvm_pkg
+# Then try installing Ruby:
+rvm install ruby 2.5.1
+rvmsudo rvm install 1.9.2
+rvm use 2.5.1 --default
+ruby -v
+rvm reinstall ruby-2.5.1
+--------------------------------------------------------------------
+rvm gemset create qna
+rvm use 2.6.3@qna
+gem install rails
+rails new qna -d pjstgresql
+git init
+rvm --ruby-version use 2.6.3@qna (оптимизация проекта)
+cp config/database.yml config/database.yml.sample (gitignore)
+rails db:create:all
+-------------------------------------------------------------------
+use rvm to manage the Ruby versions installed on the system:
+rvm install ruby 2.6.2
+
+===============================================
+--------------------------------------------------------------
+_I. Установка RVM_to Ubuntu 18.10
+https://github.com/rvm/ubuntu_rvm
+sudo apt-get install software-properties-common
+sudo apt-add-repository -y ppa:rael-gc/rvm
+sudo apt-get update
+sudo apt-get install rvm
+
+4. Проверяем как прошла установка
+  $ rvm -v
+  rvm 1.6.20 by Wayne E. Seguin (wayneeseguin@gmail.com) [https://rvm.beginrescueend.com/]
+  если вы видите версию rvm, значит всё ОК 
+
+gem env version
+gem update --system
+gem -v
+echo "gem: --no-document" >> ~/.gemrc   опционально
+
+rvmsudo gem install bundler -v 1.5.0
+gem install bundler -v 1.5.-
+bundle _1.5.0_ install
+
+---------------------------------------------------------
+_II Работа разными версиями Руби_
+Чтобы просмотреть все доступные для установки версии Ruby
+$ rvm list known
+
+Предположим вы работаете с двумя версиями 1.8.7 для ROR2 и 1.9.2 для ROR3
+# Устанавливаем 2 версии Ruby
+$ rvm install 1.8.7
+$ rvm install 1.9.2
+
+Чтобы увидеть все установленные версии Ruby
+$ rvm list
+rvm rubies
+ruby-1.8.7-p334 [ i386 ]
+ruby-1.9.2-p180 [ i386 ]
+
+Переключиться на ruby 1.8.7
+$ rvm use ruby-1.8.7
+Using /home/user/.rvm/gems/ruby-1.8.7-p334
+
+Использовать версию ruby 1.9.2 по умолчанию
+$ rvm use ruby 1.9.2 --default
+Using /home/user/.rvm/gems/ruby-1.9.2-p180
+$ rvm list
+rvm rubies
+=> ruby-1.9.2-p180 [ i386 ] # "=>" показывают версию Ruby установленную по умолчанию
+   ruby-1.8.7-p334 [ i386 ]
+------------------------------------------------------------------   
+_III Работа с gemset_
+Например вы используете Ruby On Rails версии 2 и 3 с Ruby 1.8.7 и для каждого из них у вас свой набор gem's.
+Создадим два разных набора gemset'ов:
+$ rvm use 1.8.7@rails2 --create
+  Using /home/user/.rvm/gems/ruby-1.8.7-p334 with gemset rails2
+$ rvm use 1.8.7@rails3 --create
+  Using /home/user/.rvm/gems/ruby-1.8.7-p334 with gemset rails3
+$ rvm gemset list
+  gemsets for ruby-1.8.7-p334 (found in /home/slip/.rvm/gems/ruby-1.8.7-p334)
+    global # gemset по умолчанию
+    rails2
+    rails3
+$ rvm use 1.8.7@rails3 --default # Использовать gemset rails3 по умолчанию
+$ rvm gemset list
+  gemsets for ruby 1.8.7-p334 (found in /home/user/.rvm/gems/ruby-1.8.7-p334)
+    global
+    rails2
+ => rails3 # rails3 стоит по умолчанию
+ 
+Gemset'ы можно удалять, очищать, экспортировать и импортировать гемы из одного в gemset'a в другой.
+RVM предоставляет следующие команды для работы с gemsets:
+  create — создание нового gemset
+  export — экспорт списка гемов в файл default.gems
+  import — установка в текущий gemset списка гемов из файла default.gems
+  delete — удалить gemset
+  empty — очистить gemset
+  
+------------------------------------------------------------------
+_IV Задание окружения под отдельный проект с помощью .rvmrc_
+
+Как быть если у вас несколько проектов, каждый из которых используют разную версию gemset? 
+Можно конечно переключиться между gemset'ами вручную с помощь rvm use {rubyversion}@{gemsetname}, 
+но и тут RVM приходит нам на помощь, делая эту часть работы за нас.
+Создаем файл .rvmrc в корневой директории проекта. 
+Например проект используют ruby версии 1.8.7 с gemset projectname.
+#Содержимое файла .rvmrc
+rvm use 1.8.7@projectname
+
+Теперь когда вы заходите в директорию, 
+cd /home/user/www/projectname — RVM исполняет команду из файла .rvmrc 
+и вы видите на экране подобное сообщение Using /home/user/.rvm/gems/ruby-1.8.7-p334 with gemset projectname
+
+Таким образом вам больше не приходиться думать какой gemset использует конкретный проект и устанавливать его вручную.
+------------------------------------------------------------------
+_V Команда RVM которые могут оказаться полезными_
+
+1. Completion — позволяет использовать tab при работе с rvm
+Чтобы включить, добавьте строку [[ -r $rvm_path/scripts/completion ]] &&. $rvm_path/scripts/completion в файл .bashrc или .bash_profile, 
+после строки с подлючением rvm. Подробнее можно почитать здесь rvm.beginrescueend.com/workflow/completion
+2. rvmreset — перезагрузка RVM
+3. rvm uninstall — удалить одну или несколько версию Ruby, оставив исходники
+4. rvm implode — полностью удалить RVM (удаляет ВСЁ)
+-------------------------------------------------------------------
+_VI Шпаргалка по о RVM_
+
+rvm list known — получить список всех версий ruby доступных для установки
+rvm install 1.9.1 – установить ruby версии 1.9.1
+rvm remove 1.9.2 – удалить ruby версии 1.9.2
+rvm use 1.9.2 — переключиться на ruby версии 1.9.2
+rvm use 1.9.2@rails3 --default — установить версию ruby 1.9.2 c gemset rails3 по умолчанию
+rvm use system — использовать системную версию ruby
+rvm list – список установленных версий ruby
+rvm gemset list – список gemset'ов в выбранной версии ruby
+rvm use 1.9.2@rails3 --create создать gemset rails3 для ruby версии 1.9.2
+rvm gemset export — экспортировать гемсет в файл default.gems
+rvm gemset import default.gems — установить gem's из списка в файле defaults.gem в текущий gemsetалить одну или несколько версию Ruby, оставив исходники
+
+.rvmrc
+export rvm_environments_path="${HOME}/.rvm/environments"
+export rvm_gems_path="${HOME}/.rvm/gems"
+export rvm_gems_cache_path="${HOME}/.rvm/gems_cache"
+export rvm_wrappers_path="${HOME}/.rvm/wrappers"
+export rvm_create_flag="1" 
+export rvm_user_path="${HOME}/.rvm/user"
+export rvm_log_path="${HOME}/.rvm/log"                                        
+export RUBYOPT='-W:no-deprecated -W:no-experimental'
+rvm_silence_path_mismatch_check_flag=1 
+-
+Installing RVM to /home/kv-2/.rvm/
+    Adding rvm PATH line to /home/kv-2/.profile /home/kv-2/.mkshrc /home/kv-2/.bashrc /home/kv-2/.zshrc.
+    Adding rvm loading line to /home/kv-2/.profile /home/kv-2/.bash_profile /home/kv-2/.zlogin.
+Installation of RVM in /home/kv-2/.rvm/ is almost complete:
+
+  * To start using RVM you need to run `source /home/kv-2/.rvm/scripts/rvm`
+    in all your open shell windows, in rare cases you need to reopen all shell windows.
+-
+
+Don't run Bundler as root. Bundler can ask for sudo if it is needed, and
+installing your bundle as root will break this application for all non-root users
+on this machine.
+The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+
+
+Failed to completely remove /usr/share/rvm -- You will have to do so manually.
+
+Note you may need to manually remove /etc/rvmrc and ~/.rvmrc if they exist still.
+Please check all .bashrc .bash_profile .profile and .zshrc for RVM source lines and delete or comment out if this was a Per-User installation.
+Also make sure to remove `rvm` group if this was a system installation.
+Finally it might help to relogin / restart if you want to have fresh environment (like for installing RVM again).

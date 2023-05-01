@@ -1,0 +1,17 @@
+# приготовить данные для сохранения, например список юзеров
+@users = User.all
+or
+@users = User.where(status: 'active')
+# определить путь и файл для сохранения
+file = "#{Rails.root}/public/#{Date.current}-user_list.csv"
+# определить заголовки и записать данные в файл
+headers = ["Id", "Name", "Date of Birth" ,"Email", "Status"]
+CSV.open(file, 'w', write_headers: true, headers: headers) do |writer|
+  users.each do |user|
+    writer << [user.id, user.name, user.dob, user.email, user.status]
+  end
+end
+# почекать файл
+nano #{file}
+или по пути
+http://localhost:3000/#{file}

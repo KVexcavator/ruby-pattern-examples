@@ -1,0 +1,127 @@
+rbenv.txt
+
+Agile web dev with 6 p.12
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+source ~/.bashrc
+и\или с .zshrc
+правильность настройки rbenv
+type rbenv
+установите плагин ruby-build. Этот плагин добавляет команду rbenv install, упрощающую процесс установки новых версий Ruby:
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+список всех доступных версий Ruby:
+rbenv install -l
+rbenv install -L все
+обновить список
+cd ~/.rbenv/plugins/ruby-build and git pull
+rbenv versions  установленные
+установить ruby
+rbenv install 2.7.2
+исползовать версию
+rbenv global 2.7.2
+ruby -v
+
+echo "gem: --no-document" > ~/.gemrc
+gem install bundler (удалял папаку .bundle когда требовал прав)
+gem env home
+
+
+установить rails gem
+доступные для скачивания:
+gem search '^rails$' --all
+доступные локально:
+gem list --local rails
+установка
+gem install rails -v 6.0.1
+gem uninstall rails -v 6.0.1
+переключение
+надо переключать версию ruby
+rails _6.0.1_ --version
+rails -v
+создать с версией
+rails _5.2.4_ new .  --skip-webpack-install --skip-bundle и другие
+rails new . --api  --skip-webpack-install --skip-bundle -T --database=postgresql
+rails new cash_flow_api --api --skip-webpack-install --skip-bundle --database=postgresql -T
+
+rbenv создает каталог shims, указывающий на файлы, которые используются текущей активной версией Ruby
+Используя субкоманду rehash, rbenv сохраняет shims в этом каталоге для соответствия всех команд Ruby во всех установленных версиях Ruby на вашем сервере. При установке новой версии Ruby или элемента gem, который предоставляет команды, наподобие Rails, нужно использовать следующую команду:
+rbenv rehash
+
+
+Обновление rbenv
+cd ~/.rbenv
+git pull
+
+Удаление версий Ruby
+rbenv uninstall 2.1.3
+
+Удаление rbenv
+nano ~/.bashrc
+две строки и удалите их:
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
+Затем
+rm -rf `rbenv root`
+curl -sL \
+https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash -
+=============================================
+установка дополнительного совта для Rails
+sudo apt-get update
+sudo apt-get install -y autoconf \
+bison \
+build-essential \
+curl \
+g++ \
+gcc \
+git \
+libffi-dev \
+libgconf-2-4 \
+libgdbm-dev \
+libncurses5-dev \
+libreadline-dev \
+libreadline-dev \
+libsqlite3-dev \
+libssl-dev \
+libxi6 \
+libyaml-dev \
+make \
+sqlite3 \
+xvfb \
+zip \
+zlib1g-dev
+=============================================
+install ChromeDriver ?? gromium
+=============================================
+Прблемма установки 2.2.4
+rbenv install 2.2.4
+вываливается
+...
+The Ruby openssl extension was not compiled.
+ERROR: Ruby install aborted due to missing extensions
+Try running `apt-get install -y libssl-dev` to fetch missing dependencies.
+
+Configure options used:
+  --prefix=/home/exc/.rbenv/versions/2.2.4
+  LDFLAGS=-L/home/exc/.rbenv/versions/2.2.4/lib 
+  CPPFLAGS=-I/home/exc/.rbenv/versions/2.2.4/include 
+===
+базовые команды
+openssl version
+openssl help
+
+найти папку
+$ openssl version -a | grep OPENSSLDIR
+OPENSSLDIR: "/usr/lib/ssl
+поймать пакеты которых не хватает
+apt-cache search libssl | grep SSL
+----
+apt-get install libssl1.0-dev
+=========================================
+nokogiri requires Ruby version < 3.1.dev, >= 2.5.
+
+были проблемы с цстановкой, рельсы , запускал ,bundle install  там такое писало и помогло епта
+gem update --system 3.2.3
+
