@@ -28,7 +28,7 @@ class CreateFile < Command
     @path = path
     @contents = contents
   end
-
+  lib
   def execute
     f = File.open(@path, "w")
     f.write(@contents)
