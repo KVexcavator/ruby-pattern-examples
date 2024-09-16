@@ -11,89 +11,66 @@
 # [1, 1, 0]
 # [1, 1, 1]
 
-class LockNode
-  attr_accessor :value
-  attr_reader :children
-  BRANCHES = []
+def find_path(disc_count, from, to, exclude)
+  # Используем очередь для BFS
+  queue = [[from]]
+  # Сет для хранения посещенных комбинаций
+  visited = [from]
 
-  def initialize(value)
-    @value = value
-    @children = []
+  until queue.empty?
+    path = queue.shift
+    current = path.last
 
-    value.each_with_index do |e,i|
-      n = i + 1
+    # Проверяем, достигли ли мы целевой комбинации
+    return path if current == to
 
-      first = value.map(&:clone)
-      first[i] = (first[i] + 1 if first[i].between?(0,8)) || 0
+    # Генерируем возможные переходы
+    puts "===="
+    p next_steps = generate_next_steps(current, disc_count)
 
-      second = value.map(&:clone)
-      second[i] = (second[i] - 1 if second[i].between?(1,9)) || 9
+    next_steps.each do |next_step|
+      # Проверяем, не является ли следующий шаг запрещенной или уже посещенной комбинацией
+      next if exclude.include?(next_step) || visited.include?(next_step)
 
-      BRANCHES << name = "branch_#{n}"
-      instance_variable_set("@#{name}", first)
-      BRANCHES << name = "branch_#{n += value.size}"
-      instance_variable_set("@#{name}", second)
-      @children << first << second
+      # Добавляем новый путь в очередь и отмечаем как посещенный
+      queue << (path + [next_step])
+      visited << next_step
     end
   end
 
-  def LockNode.full(value)
-    node = new(value)
-    BRANCHES.each do |name|
-      node.instance_eval { class << self; self end }.send(:attr_accessor, name)
-    end
-    node
-  end
-
+  # Если решения нет
+  "Решения нет"
 end
 
+# Генерация всех возможных переходов на основе текущей позиции
+def generate_next_steps(current, disc_count)
+  next_steps = []
 
+  disc_count.times do |i|
+    # Копируем текущий массив
+    next_step_up = current.dup
+    next_step_down = current.dup
 
-class SearchTree
+    # Пытаемся увеличить и уменьшить диск i, если возможно
+    next_step_up[i] += 1 if next_step_up[i] < 1
+    next_step_down[i] -= 1 if next_step_down[i] > 0
 
-  def self.plant(root, target, excluded )
-    # base
-    node = LockNode.full(root)
-    p parrent = node.value
-    children = node.children
-    children = children.select do |value|
-      !excluded.include?(value)
-    end
-    if children.include?(target)
-      p target
-      print "Done!"
-      return
-    end
-
-    # find next node
-    next_node = parrent
-    target.each_with_index do |value ,index|
-      pass = children.select {|item| item[index] != parrent[index]}
-      begin
-        if pass.size == 2
-          next_node[index] = value
-          # ckeck
-          if excluded.include?(next_node)
-            next_node[index] = pass.last[index]
-          end
-          # recursi
-          plant(next_node, target, excluded)
-          return
-        end
-      rescue
-        puts "NO PATH"
-      end
-    end
+    # Добавляем новые возможные позиции
+    next_steps << next_step_up unless next_step_up == current
+    next_steps << next_step_down unless next_step_down == current
   end
 
+  next_steps
 end
 
-
-DISC_COUNT = 3
-from = [9, 0, 0]
+# Входные данные
+disc_count = 3
+from = [0, 0, 0]
 to = [1, 1, 1]
-excluded = [[0, 0, 1], [1, 0, 0]]
+exclude = [[0, 0, 1], [1, 0, 0]]
 
-path = SearchTree.plant(from, to, excluded)
+# Поиск и вывод результата
+result = find_path(disc_count, from, to, exclude)
+puts result.is_a?(Array) ? result.map(&:inspect).join("\n") : result
 
 # https://github.com/KVexcavator/ruby-pattern-examples/blob/main/tricks/lock.rb
