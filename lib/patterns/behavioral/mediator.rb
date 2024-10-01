@@ -40,7 +40,7 @@ class ListSearchMediator
   end
 
   def text_field_changed
-    @list.words = @list.words.inject([]) do |narrowed_list, word|
+    @list.words = @list.words.reduce([]) do |narrowed_list, word|
       if word.start_with?(@text_field.value)
         narrowed_list.push(word)
       end

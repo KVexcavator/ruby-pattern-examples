@@ -4,8 +4,6 @@
 # Пример: [-1, -13, -2, 1, -3, 4, -1, 2, 1, -5, 4] должно вернуть [4, -1, 2, 1].
 # Kadane's algoritm
 
-
-
 def max_subarray(nums)
   best_start = best_end = 0
   best_sum = current_sum = -1.0/0 # -Infinity
