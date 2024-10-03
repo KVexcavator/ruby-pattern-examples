@@ -1,0 +1,176 @@
+Active Storage не поддерживает SFTP из коробки, но вы можете реализовать эту функциональность, используя кастомный сервис для Active Storage. Вот как вы можете это сделать:
+
+### Шаг 1: Установите необходимые гемы
+
+Для работы с SFTP можно использовать гем `net-sftp`. Добавьте его в ваш `Gemfile` и установите:
+
+```ruby
+gem 'net-sftp'
+```
+
+После этого выполните:
+
+```bash
+bundle install
+```
+
+### Шаг 2: Создайте кастомный SFTP сервис для Active Storage
+
+Создайте новый файл в `app/services/active_storage/service/sftp_service.rb`:
+
+```ruby
+# app/services/active_storage/service/sftp_service.rb
+require "net/sftp"
+require "active_storage/service"
+
+module ActiveStorage
+  class Service::SFTPService < Service
+    def initialize(host:, user:, password:, root_path:, **options)
+      @host = host
+      @user = user
+      @password = password
+      @root_path = root_path
+    end
+
+    def upload(key, io, checksum: nil, **options)
+      Net::SFTP.start(@host, @user, password: @password) do |sftp|
+        sftp.upload!(io, path_for(key))
+      end
+    end
+
+    def download(key, &block)
+      Net::SFTP.start(@host, @user, password: @password) do |sftp|
+        sftp.download!(path_for(key), &block)
+      end
+    end
+
+    def delete(key)
+      Net::SFTP.start(@host, @user, password: @password) do |sftp|
+        sftp.remove!(path_for(key))
+      end
+    end
+
+    def exist?(key)
+      Net::SFTP.start(@host, @user, password: @password) do |sftp|
+        sftp.file.open(path_for(key)) do |file|
+          file ? true : false
+        end
+      rescue Net::SFTP::StatusException
+        false
+      end
+    end
+
+    private
+
+    def path_for(key)
+      File.join(@root_path, key)
+    end
+  end
+end
+```
+
+### Шаг 3: Настройте кастомный сервис в `storage.yml`
+
+Теперь, когда у вас есть кастомный сервис, настройте его в `config/storage.yml`:
+
+```yaml
+sftp:
+  service: SFTP
+  host: "sftp.example.com"
+  user: "username"
+  password: "password"
+  root_path: "/path/to/storage"
+```
+
+### Шаг 4: Настройте приложение для использования SFTP
+
+Установите SFTP как основной сервис для Active Storage в `config/environments/production.rb` или в любой другой нужной среде:
+
+```ruby
+config.active_storage.service = :sftp
+```
+============================================================
+Для использования Active Storage с SFTP в Dockerized приложении на Ruby on Rails, необходимо выполнить следующие шаги:
+
+### 1. Установите необходимые гемы
+Active Storage не поддерживает SFTP напрямую, поэтому потребуется использовать сторонний гем, например, `activestorage-sftp`. Этот гем добавляет поддержку SFTP для Active Storage.
+
+Добавьте гем в ваш `Gemfile`:
+
+```ruby
+gem 'activestorage-sftp'
+```
+
+Затем выполните:
+
+```bash
+bundle install
+```
+
+### 2. Настройка Active Storage
+В файле `config/storage.yml` добавьте конфигурацию для SFTP:
+
+```yaml
+sftp:
+  service: SFTP
+  host: <SFTP_HOST>
+  user: <SFTP_USER>
+  password: <SFTP_PASSWORD>
+  upload: :move # Используйте :copy для копирования или :move для перемещения файлов после загрузки
+  path: "/path/to/your/storage" # Путь на SFTP-сервере, где будут храниться файлы
+  port: 22 # Порт по умолчанию для SFTP
+```
+
+### 3. Настройка Docker
+Если ваше Rails-приложение работает внутри Docker-контейнера, вам нужно убедиться, что контейнер может соединиться с SFTP-сервером.
+
+Если SFTP-сервер находится в отдельном контейнере, добавьте его в ваш `docker-compose.yml`:
+
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - RAILS_ENV=development
+    depends_on:
+      - sftp
+
+  sftp:
+    image: atmoz/sftp
+    ports:
+      - "2222:22"
+    volumes:
+      - ./path/to/sftp_storage:/home/<SFTP_USER>/upload
+    environment:
+      SFTP_USERS: "<SFTP_USER>:<SFTP_PASSWORD>:upload"
+```
+
+Если SFTP-сервер внешне доступен, убедитесь, что у вашего приложения есть доступ к сети и правильные креды.
+
+### 4. Настройка среды
+Теперь нужно указать Rails, чтобы он использовал SFTP в нужной среде. В `config/environments/development.rb` (или в `production.rb`, в зависимости от вашей среды):
+
+```ruby
+config.active_storage.service = :sftp
+```
+
+### 5. Использование Active Storage в коде
+Теперь вы можете использовать Active Storage, как обычно. Например, для загрузки аватарки пользователя:
+
+```ruby
+class User < ApplicationRecord
+  has_one_attached :avatar
+end
+```
+
+### 6. Запуск Docker-контейнеров
+Запустите контейнеры:
+
+```bash
+docker-compose up --build
+```
+
+Это запустит ваше приложение и SFTP-сервер (если он внутри Docker). Теперь ваше приложение должно быть готово загружать и загружать файлы через SFTP.
