@@ -1,8 +1,0 @@
-# обычное удаление из хеша
-basket = { fruits: ["apple", "grapes"], veggies: ["kale", "cabbage"] }
-basket.delete(:veggies)
-
-# если хотим избежать изменения оригинала
-
-basket = { fruits: ["apple", "grapes"], veggies: ["kale", "cabbage"] }
-newbasket = basket.dup.tap { |produce| produce.delete(:veggies) }

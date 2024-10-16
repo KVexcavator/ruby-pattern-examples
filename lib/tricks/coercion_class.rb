@@ -24,7 +24,7 @@ class TimeInterval
     "#{minutes}:#{seconds}"
   end
  end
- # Now we’re able to create a new TimeInterval by either calling TimeInterval.new and pass the number of total seconds, or I can call TimeInterval.parse and pass a string. The to_s function works well enough for our purposes.
+ # Теперь мы можем создать новый TimeInterval, либо вызвав TimeInterval.new и передав общее количество секунд, либо я могу вызвать TimeInterval.parse и передать строку. Функция to_s работает достаточно хорошо для наших целей.
 
  TimeInterval.new(75)
  #<0xb758bb5c value="75">

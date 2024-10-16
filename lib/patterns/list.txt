@@ -13,7 +13,8 @@ Structural patterns:
 + Adapter
 Adapter pipeline
 Retrofit Interface
-Aggregate
++ Aggregate
++ Composition
 + Bridge
 Tombstone
 + Composite
@@ -46,9 +47,11 @@ Specification
 + Strategy
 + Template method
 Visitor
++ Repository
 
 шаблоны параллелизма — это те типы шаблонов проектирования, которые имеют дело с парадигмой многопоточного программирования
 Concurrency patterns:
+Producer/Consumer
 Active Object
 Balking pattern
 Barrier
