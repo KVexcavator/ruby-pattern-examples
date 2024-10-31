@@ -1,7 +1,7 @@
 # https://makandracards.com/alexander-m/39299-memento
 # Снимок — это поведенческий паттерн проектирования, который позволяет делать снимки состояния объектов, не раскрывая подробностей их реализации. Затем снимки можно использовать, чтобы восстановить прошлое состояние объектов.
 
-# Организатор, обиект чьё сотояне сохраняется
+# Организатор, объект чьё сотояне сохраняется
 class Post
   attr_accessor :title, :body
 
@@ -46,7 +46,7 @@ class VersionHistory
     @versions[number]
   end
 end
-# Исползование
+# Использование
 # создать Post и хранилище версий
 post   = Post.new('My First Post', 'This is my first post. I hope people like it')
 folder = VersionHistory.new
