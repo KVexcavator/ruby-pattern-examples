@@ -23,7 +23,7 @@ class Author
   end
 end
 
-# так даже лучьше
+# так даже лучше
 class Author
   # ...
   def monthly_revenue(revenue_calculator)

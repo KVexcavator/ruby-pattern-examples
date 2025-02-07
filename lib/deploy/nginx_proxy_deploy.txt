@@ -1,0 +1,91 @@
+backend 
+!!! crossorigin tuning
+```Dockerfile
+FROM python:3.11.9-slim
+COPY package.json package.json
+# first dependencies
+RUN pip install -r requirements.txt
+# then copy
+COPY  . .
+CMD [ "python", "main.py"]
+```
+---------------------------------------
+frontend
+```Dockerfile
+FROM node:alpine as build
+COPY package.json package.json
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:stable-alpine
+COPY --from=build  /dist   /usr/share/nginx/html
+COPY --from=build  nginx.conf  /etc/nginx/conf.d/default.conf
+EXPOSE 3000
+CMD["nginx", "-g", "daemon off;"]
+```
+
+```nginx.conf
+server {
+	listen 3000;
+	location / {
+			root /usr/share/nginx/html;
+			index index.html index.htm;
+			try_files $uri $uri/  /index.html  =404;
+	}	
+	include /etc/nginx/extra-conf.d/*.conf;
+}
+----------------------------------------
+overall files
+
+```docker-compose.yml
+networks:
+	dev:
+services:
+	nginx:
+		image: nginx:stable-alpine
+		ports:
+			- "80:80"
+		volumes:
+			- './nginx.conf:/etc/nginx/nginx.conf'
+		depends_on:
+			- backend
+			- frontend
+		networks:
+			- dev
+	
+		backend:
+			build:
+				context: ./backend
+			networks:
+			 - dev
+			 
+		frontend:
+			build:
+				context: ./frontend
+			networks:
+			 - dev
+```
+
+```nginx.conf
+user root;
+worker_processes 1;
+
+events {
+}
+
+http {
+	server {
+		listen 80;
+		server_name localhost;
+		
+		location / {
+			proxy_pass http://frontend:3000/;
+		}
+		
+		location /api/ {
+			proxy_pass http://backend:8000/;
+		}
+	}
+}
+```
