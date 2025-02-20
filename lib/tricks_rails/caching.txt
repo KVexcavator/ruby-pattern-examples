@@ -1,0 +1,105 @@
+Стратегии кеширования в RoR API:
+1. Кеширование на уровне запросов (HTTP-кеширование)
+Позволяет клиентам (браузерам, мобильным приложениям) сохранять данные и повторно их использовать.
+- **ETag** и **Last-Modified** — клиент запрашивает ресурс, а сервер отвечает `304 Not Modified`, если данные не изменились.
+- **Cache-Control** — можно задать срок хранения (`max-age`), `public/private` и `must-revalidate`.
+
+Пример в контроллере:
+```ruby
+class PostsController < ApplicationController
+  before_action :set_post, only: [:show]
+
+  def show
+    fresh_when(@post) # Использует ETag и Last-Modified
+  end
+
+  private
+
+  def set_post
+    @post = Post.find(params[:id])
+  end
+end
+```
+=========================================================
+2. Кеширование на уровне представлений (Fragment Caching)
+Используется, если API рендерит HTML или JSON-ответы, требующие дорогих вычислений.
+- Action Caching (полное кеширование ответа)
+- Fragment Caching (кеширование частей ответа)
+- Low-Level Caching (кеширование произвольных данных)
+
+Пример кеширования JSON в API-контроллере:
+```ruby
+class PostsController < ApplicationController
+  def index
+    posts = Rails.cache.fetch("posts/all", expires_in: 10.minutes) do
+      Post.all.to_json
+    end
+      render json: posts
+  end
+end
+```
+==================================================
+3. Кеширование на уровне базы данных (SQL-кеширование)
+- Использование `Rails.cache.fetch` для кеширования частых SQL-запросов.
+- Materialized Views (в PostgreSQL) или временные таблицы.
+- Identity Map — минимизация количества запросов к БД.
+
+Пример кеширования дорогого SQL-запроса:**
+```ruby
+def expensive_query
+  Rails.cache.fetch("expensive_query", expires_in: 5.minutes) do
+    Post.joins(:comments).where("comments.created_at > ?", 1.day.ago).to_a
+  end
+end
+```
+==========================================================
+4. Кеширование в бекенде (Redis, Memcached)
+- Redis отлично подходит для хранения кэша, особенно в API-first приложениях.
+- Memcached — альтернатива Redis, используется в высоконагруженных системах.
+
+Пример использования Redis в Rails:
+```ruby
+Rails.cache.write("my_key", "some_value", expires_in: 1.hour)
+Rails.cache.read("my_key") # => "some_value"
+```
+=============================================================
+5. Кеширование фоновых задач (ActiveJob + Sidekiq + Redis)
+- Если API обрабатывает тяжелые задачи (генерация отчетов, загрузка файлов), их можно кешировать и обновлять в фоне.
+
+Пример обновления кеша через ActiveJob:
+```ruby
+class CacheUpdateJob < ApplicationJob
+  queue_as :default
+
+  def perform
+    Rails.cache.write("expensive_data", compute_expensive_data, expires_in: 1.hour)
+  end
+
+  private
+
+  def compute_expensive_data
+    # Долгий процесс...
+    Post.all.to_json
+  end
+end
+```
+============================================================
+6. Edge-кеширование (CDN + Nginx)
+- Использование Cloudflare, Fastly или Akamai для кеширования API-ответов.
+- Настройка Nginx для кеширования API-запросов.
+
+Пример кеширования в Nginx:
+```
+location /api/ {
+  proxy_cache api_cache;
+  proxy_cache_valid 200 10m;
+  proxy_pass http://backend;
+}
+```
+===========================================
+Какую стратегию выбрать?
+- Если много запросов к API → Redis/Memcached.
+- Если дорогостоящие SQL-запросы → Rails.cache.fetch.
+- Если важна производительность фронта → HTTP-кеширование (ETag, Last-Modified).
+- Если API тяжело рендерит JSON → Кеширование в контроллерах.
+- Если API отдает статичные данные → Использовать CDN.

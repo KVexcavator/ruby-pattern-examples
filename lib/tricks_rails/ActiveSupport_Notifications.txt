@@ -1,0 +1,133 @@
+deprecation.rails Hook из ActiveSupport::Notifications
+
+В Rails существует механизм уведомлений (`ActiveSupport::Notifications`), который позволяет отслеживать различные события в приложении, включая устаревшие методы и функции. 
+
+Когда в Rails используется устаревший метод, фреймворк отправляет уведомление с именем deprecation.rails, которое можно перехватывать и обрабатывать.
+===========================================
+Как это работает?
+Когда вызывается устаревший метод (deprecation warning), ActiveSupport автоматически отправляет уведомление `deprecation.rails`. Это уведомление содержит полезную информацию, например:
+- Сообщение об устаревании,
+- Стек вызовов,
+- Версию Rails, где метод был помечен устаревшим.
+
+Мы можем подписаться на этот хук и, например, логировать сообщения, отправлять их в систему мониторинга или даже останавливать выполнение в тестах.
+==============================================
+Пример использования deprecation.rails
+
+1. Подписка на deprecation.rails
+Можно использовать ActiveSupport::Notifications.subscribe, чтобы обработать уведомления об устаревании:
+
+```ruby
+ActiveSupport::Notifications.subscribe("deprecation.rails") do |name, started, finished, unique_id, data|
+  puts "[DEPRECATION WARNING] #{data[:message]}"
+end
+```
+- Мы подписываемся на события `deprecation.rails`.
+- Когда Rails вызывает устаревший метод, хук срабатывает.
+- data[:message] содержит текстовое сообщение об устаревании.
+Теперь при вызове устаревшего метода мы увидим сообщение в консоли.
+===========================================
+2. Пример генерации устаревшего метода
+Допустим, у нас есть код с устаревшим методом `String#squish!`, и мы хотим отловить его:
+
+```ruby
+require "active_support/all"
+
+ActiveSupport::Deprecation.warn("Метод `squish!` устарел и будет удалён в будущих версиях!")
+
+"  Hello   World  ".squish! # вызовет предупреждение
+```
+Вывод в консоли:
+```
+[DEPRECATION WARNING] Метод `squish!` устарел и будет удалён в будущих версиях!
+```
+=====================================
+3. Перенаправление устаревших сообщений в лог
+Вместо вывода в консоль можно записывать их в лог:
+
+```ruby
+ActiveSupport::Notifications.subscribe("deprecation.rails") do |name, started, finished, unique_id, data|
+  Rails.logger.warn("[DEPRECATION] #{data[:message]}")
+end
+```
+Теперь все сообщения об устаревании будут записываться в `log/development.log`.
+======================================
+4. Отправка в систему мониторинга (например, в Sentry)
+Если у вас настроен **Sentry** или другая система мониторинга ошибок, можно отправлять туда уведомления:
+```ruby
+require 'sentry-ruby'
+
+ActiveSupport::Notifications.subscribe("deprecation.rails") do |name, started, finished, unique_id, data|
+  Sentry.capture_message("Deprecation warning: #{data[:message]}", level: :warning)
+end
+```
+Теперь каждое предупреждение об устаревании будет логироваться в **Sentry**, что удобно для контроля миграции к новым версиям.
+=================================
+=================================
+В Rails можно настраивать обработку `deprecation.rails` в нескольких местах, в зависимости от того, как глобально или локально вы хотите управлять этими уведомлениями.
+=================================
+1. Глобальная настройка для всего приложения
+config/initializers/deprecation_notifications.rb  
+```ruby
+# Подписка на уведомления об устаревании
+ActiveSupport::Notifications.subscribe("deprecation.rails") do |name, started, finished, unique_id, data|
+  Rails.logger.warn("[DEPRECATION] #{data[:message]}") # Логируем в стандартный лог Rails
+end
+```
+Этот код будет загружаться при старте приложения и применяться ко всему проекту.
+=========================================
+2. Настройка через `config/environments/*.rb` (по окружениям)
+Rails позволяет отдельно настраивать поведение для разных окружений (development, production, test).
+
+config/environments/development.rb
+```ruby
+config.active_support.deprecation = :log # Логировать в development.log
+```
+config/environments/production.rb`
+```ruby
+config.active_support.deprecation = :notify # Отправлять в систему мониторинга ошибок (например, Sentry, Bugsnag)
+```
+config/environments/test.rb`
+```ruby
+config.active_support.deprecation = :stderr # Выводить предупреждения в стандартный вывод (полезно для тестов)
+```
+
+Доступные опции:
+- :log — записывать в лог-файл (`log/development.log`, `log/production.log`).
+- :stderr — выводить в стандартный поток ошибок (STDERR).
+- :notify — передавать в систему мониторинга (`Rails.logger` или другие сервисы).
+- :raise — вызывать ошибку (можно использовать в тестах для отлова устаревших вызовов).
+=======================================
+3. Внутри конкретных классов или модулей
+
+```ruby
+class MyService
+  def initialize
+    ActiveSupport::Notifications.subscribe("deprecation.rails") do |name, started, finished, unique_id, data|
+      Rails.logger.info("Deprecation warning caught in MyService: #{data[:message]}")
+    end
+  end
+
+  def some_method
+    ActiveSupport::Deprecation.warn("Этот метод устарел!") # Это сгенерирует уведомление
+  end
+end
+```
+======================================
+4. В тестах (RSpec, Minitest)
+В тестах иногда полезно проверять, что нет устаревших вызовов. Можно заставить тесты падать при их появлении.
+
+spec/spec_helper.rb или test/test_helper.rb
+```ruby
+ActiveSupport::Deprecation.behavior = :raise # Поднимаем исключение при любом устаревшем вызове
+```
+Или можно использовать `capture`:
+```ruby
+it "does not use deprecated methods" do
+  expect {
+    some_deprecated_method
+  }.to raise_error(ActiveSupport::DeprecationException)
+end
+```
+Если в коде вызовется устаревший метод, тест упадёт.
+
