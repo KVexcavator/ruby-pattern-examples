@@ -1,0 +1,17 @@
+подробнее о паттернах Ruby on Rails, подробный обзар  Form Objects, нужен понятный пример, как это правильно распологать в структуре папок рельсы, как надо настроить конфиги, дополнителые трюки и практики применения
+
+1. Service Objects (Объекты-сервисы)
+2. Form Objects (Объекты-формы)
+Query Objects (Объекты-запросы)
+Repository Pattern (Репозиторий)
+Event-Driven Architecture (Событийно-ориентированная архитектура)
+Event Bus (Шина событий)
+CQRS (Command Query Responsibility Segregation)
+Domain-Driven Design (DDD) в Rails
+Use Case (Применяемый сценарий)
+Config Object (Объект конфигурации)
+Command Pattern (Команда)
+Operation Object (Объект-операция, аналог Interactor)
+Policy Object (Политики доступа)
+ViewComponent (Компонентная архитектура)
+Route Service Objects (Динамические маршруты через сервис)
