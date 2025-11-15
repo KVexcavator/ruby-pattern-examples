@@ -298,9 +298,9 @@ tri_state << "Connecticut"
 tri_state.delete("Connecticut")
 tri_state.add?("Pennsylvania") если нет добавить
 
- intersection , aliased as &
- union , aliased as + and |
- difference , aliased as -
+intersection , aliased as &
+union , aliased as + and |
+difference , aliased as -
 
 tri_state.merge(["New York"])
 state_set.merge(state_hash.keys)
@@ -338,7 +338,7 @@ states.drop_while {|s| /N/.match(s) }
 %w(Ruby C APL Perl Smalltalk).min -> "APL"
 %w(Ruby C APL Perl Smalltalk).min {|a,b| a.size <=> b.size } -> "C"
 %w{ Ruby C APL Perl Smalltalk }.min_by {|lang| lang.size } -> "C"
-%w{ Ruby C APL Perl Smalltalk }.minmax -> "APL", "Smalltalk"]
+%w{ Ruby C APL Perl Smalltalk }.minmax -> "APL", "Smalltalk"
 %w{ Ruby C APL Perl Smalltalk }.minmax_by {|lang| lang.size } -> ["C", "Smalltalk"]
 
 state_hash.min - по ключу по умолчанию

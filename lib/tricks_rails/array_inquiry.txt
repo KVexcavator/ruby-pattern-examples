@@ -1,0 +1,16 @@
+В Ruby метод `Array#inquiry` доступен благодаря ActiveSupport. Он превращает массив в объект `ActiveSupport::StringInquirer`, предоставляя удобный способ проверять значения с использованием методов-предикатов.
+
+Пример использования:
+
+```ruby
+require 'active_support/core_ext/array/inquiry'
+
+statuses = %w[pending approved rejected].inquiry
+
+puts statuses.pending?   # => true
+puts statuses.approved?  # => true
+puts statuses.rejected?  # => true
+puts statuses.archived?  # => false
+```
+Метод #inquiry превращает массив в ActiveSupport::ArrayInquirer.
+Затем можно использовать методы-предикаты (`?`), чтобы проверить, содержится ли строка в массиве, без необходимости писать array.include?("value").

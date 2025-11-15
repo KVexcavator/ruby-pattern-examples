@@ -1,0 +1,31 @@
+halted_callback_hook в Rails относится к механизму обратных вызовов (колбэков) в Active Record или Active Model. Этот метод вызывается, когда выполнение колбэка было остановлено (например, если в `before_*`-колбэке вызван throw :abort).  
+
+Когда полезен?
+1. Отладка остановленных колбэков  
+   Можно переопределить этот метод в своей модели, чтобы логировать или обрабатывать ситуации, когда цепочка колбэков прерывается.  
+
+2. Отмена операций на основе условий  
+   Например, если before_sav` возвращает false или делает throw :abort, вызов halted_callback_hook может быть перехвачен.
+
+Пример использования
+Допустим, у нас есть модель `User`, в которой мы запрещаем обновление, если пользователь заблокирован:
+
+```ruby
+class User < ApplicationRecord
+  before_update :check_if_blocked
+
+  private
+
+  def check_if_blocked
+    if blocked?
+      Rails.logger.warn "Обновление пользователя #{id} остановлено: пользователь заблокирован"
+      throw :abort
+    end
+  end
+
+  def halted_callback_hook(filter)
+    Rails.logger.error "Колбэк #{filter} остановил выполнение"
+  end
+end
+```
+Когда before_update вызовет throw :abort, Rails автоматически вызовет halted_callback_hook(:check_if_blocked).

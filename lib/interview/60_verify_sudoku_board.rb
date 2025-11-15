@@ -26,7 +26,7 @@ def verify_sudoku_board(board)
         puts "FALSE"
         return false
       end
-      # цклочисленное веление r / 3 или r.div(3)
+      # цлочисленное деление r / 3 или r.div(3)
       if subgrid_sets[r.div(3)][c.div(3)].include?(num)
         puts "FALSE"
         return false

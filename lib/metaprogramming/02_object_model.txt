@@ -1,5 +1,5 @@
 obj = MyClass.new
-obj.methods.grep(/my/) ишет список методов
+obj.methods.grep(/my/) ищет список методов
 
 Коротко и ясно, о методах инстанса и методах класса:
 String.instance_methods == "abc".methods  # => true
@@ -101,8 +101,7 @@ module StringStuff
 	"my_string".reverse # => "esrever"
 end
 "my_string".reverse # => "gnirts_ym"
---------------------------------
-Клубок модулей
+
 
 
 

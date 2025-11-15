@@ -1,0 +1,123 @@
+book Effective Testing with RSpec 3 (Ruby 2.4, RSpec 3.6)
+cd box/rspec_3
+=========================================================
+gem install rspec -v 3.6.0
+rspec --version
+=========================================================
+rspec runner
+---------------------------------------------------------
+The Documentation Formatter
+rspec --format documentation
+gem coderay
+rspec -fd
+---------------------------------------------------------
+Identifying Slow Examples
+rspec --profile 2  - список двух самых медленных
+--------------------------------------------------------
+Running Just What You Need
+rspec spec/unit/specific_spec.rb
+---------------------------------------------------------
+Running Examples by Name
+rspec -e milk -fd
+---------------------------------------------------------
+Running Specific Failures
+rspec ./spec/coffee_spec.rb:25
+---------------------------------------------------------
+Rerunning Everything That Failed
+RSpec.configure do |config|
+	config.example_status_persistence_file_path = 'spec/examples.txt'
+end
+rspec
+rspec --only-failures
+--------------------------------------------------------
+Focusing Specific Examples
+• context becomes fcontext
+• it becomes fit
+• describe becomes fdescribe
+config.filter_run_when_matching(focus: true)
+config.example_status_persistence_file_path = 'spec/examples.txt'
+rspec
+
+Tag Filtering
+context 'with milk', focus: true do
+rspec --tag last_run_status:failed
+----------------------------------------------------------------
+================================================================
+box/expense_traker - sinatra проект
+----------------------------------------------------------------
+dependency injection (DI for short) DI in Ruby is as simple
+as passing an argument to a method
+class API < Sinatra::Base
+	def initialize(ledger:)
+		@ledger = ledger
+		super()
+	end
+end
+# Later, callers do this:
+app = API.new(ledger: Ledger.new)
+-----------------------------------------------------------------
+gem 'sequel'
+gem 'sqlite3'
+irb
+==================================================================
+RSpec ядро
+----------------------------------------------------------------
+вместо it exemple , specify , или настроить свои алиасы (стр 111)
+----------------------------------------------------------------
+hooks: before, after, around
+можно вынести хуки в spec/spec_helper.rb или spec/support
+RSpec.configure do |config|
+	config.around(:example) do |ex|
+		original_env = ENV.to_hash
+		ex.run
+		ENV.replace(original_env)
+	end
+end
+around hooks поддерживает только :example scope
+scope хуков аргументы запускать: :example(:each) - в каждом тесте, :context(:all)-один раз для группы , :suite - один раз перед тестированием
+require 'fileutils'
+RSpec.configure do |config|
+	config.before(:suite) do
+		# Remove leftover temporary files
+		FileUtils.rm_rf('tmp')
+	end
+end
+------------------------------------------------------------------
+подключение хелперов:
+module APIHelpers
+	include Rack::Test::Methods
+	def app
+		ExpenseTracker::API.new
+	end
+end
+RSpec.describe 'Expense Tracker API', :db do
+	include APIHelpers
+	# ...
+end
+автоматически
+RSpec.configure do |config|
+	config.include APIHelpers
+end
+-------------------------------------------------------------------
+Sharing Example Groups:
+RSpec.shared_context 'API helpers' do
+	include Rack::Test::Methods	
+	before ...
+end
+RSpec.describe 'Expense Tracker API', :db do
+	include_context 'API helpers'
+end 
+или автоматом
+RSpec.configure do |config|
+	config.include_context 'API helpers'
+end
+
+RSpec.shared_examples 'KV store' do |kv_store_class|
+	it ...
+end
+require 'hash_kv_store'
+require 'support/kv_store_shared_examples'
+RSpec.describe HashKVStore do
+	it_behaves_like 'KV store', HashKVStore
+end
+---------------------------------------------------------

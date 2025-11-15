@@ -155,6 +155,11 @@ module Twitter
 		end
 	end
 end
+
+client = Client.new do |c|
+  c.first_name = "Adam"
+  c.last_name = "Smith"
+end
 -----------------------------------------
 Реализация a Router DSL
 
